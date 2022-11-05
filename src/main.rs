@@ -21,8 +21,8 @@ struct MainPlayer;
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn_bundle(Camera2dBundle::default()).insert(MainCamera);
     commands.spawn_bundle(SpriteBundle {
-        texture: asset_server.load("vulkan.png"),
-        transform: Transform::from_xyz(100., 0., 0.).with_scale(Vec3::new(0.5, 0.5, 0.5)),
+        texture: asset_server.load("littleguy.png"),
+        transform: Transform::from_xyz(100., 0., 0.).with_scale(Vec3::new(2.5, 2.5, 2.5)),
         ..Default::default()
     }).insert(MainPlayer);
 }
