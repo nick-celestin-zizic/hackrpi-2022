@@ -1,9 +1,20 @@
 use bevy::prelude::*;
 use bevy::input::mouse::*;
 use bevy::render::camera::*;
+use bevy::render::render_resource::{SamplerDescriptor, FilterMode};
+use bevy::render::texture::ImageSettings;
 
 fn main() {
+
+    let nearest =
+        ImageSettings { default_sampler:
+                        SamplerDescriptor {
+                            mag_filter: FilterMode::Nearest,
+                            ..Default::default()
+                        }};
+
     App::new()
+        .insert_resource(nearest)
         .add_plugins(DefaultPlugins)
         .add_startup_system(setup)
         .add_system(cursor_grab_system)
@@ -82,9 +93,3 @@ fn my_cursor_system(
         }
     }
 }
-
-
-
-
-
-
