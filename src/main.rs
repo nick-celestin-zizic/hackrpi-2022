@@ -5,19 +5,18 @@ use bevy::render::render_resource::{SamplerDescriptor, FilterMode};
 use bevy::render::texture::ImageSettings;
 
 fn main() {
-
-    let nearest =
-        ImageSettings { default_sampler:
-                        SamplerDescriptor {
-                            mag_filter: FilterMode::Nearest,
-                            ..Default::default()
-                        }};
-
     App::new()
-        .insert_resource(nearest)
+        .insert_resource(ImageSettings {
+            default_sampler: SamplerDescriptor {
+                mag_filter: FilterMode::Nearest,
+                ..Default::default() }})
+        .insert_resource(WindowDescriptor {
+            width: 1067.0,
+            height: 800.0,
+            ..Default::default()
+        })
         .add_plugins(DefaultPlugins)
         .add_startup_system(setup)
-        .add_system(cursor_grab_system)
         .add_system(my_cursor_system)
         .run();
 }
@@ -33,27 +32,9 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn_bundle(Camera2dBundle::default()).insert(MainCamera);
     commands.spawn_bundle(SpriteBundle {
         texture: asset_server.load("littleguy.png"),
-        transform: Transform::from_xyz(100., 0., 0.).with_scale(Vec3::new(2.5, 2.5, 2.5)),
+        transform: Transform::from_xyz(100., 0., 0.).with_scale(Vec3::new(5.0, 5.0, 5.0)),
         ..Default::default()
     }).insert(MainPlayer);
-}
-
-fn cursor_grab_system(
-    mut windows: ResMut<Windows>,
-    btn: Res<Input<MouseButton>>,
-    key: Res<Input<KeyCode>>,
-) {
-    let window = windows.get_primary_mut().unwrap();
-
-    if btn.just_pressed(MouseButton::Left) {
-        window.set_cursor_lock_mode(true);
-        window.set_cursor_visibility(false);
-    }
-
-    if key.just_pressed(KeyCode::Escape) {
-        window.set_cursor_lock_mode(false);
-        window.set_cursor_visibility(true);
-    }
 }
 
 fn my_cursor_system(
