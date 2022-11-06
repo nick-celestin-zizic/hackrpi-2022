@@ -50,6 +50,7 @@ pub fn text_rendering_system(
 
     if ed.string_arr.len() <= 0
     {
+        //Add 1 for enter char
         ed.string_arr.resize((DIMENSIONS*DIMENSIONS) as usize, ' ');
     }
 
@@ -82,12 +83,22 @@ pub fn text_rendering_system(
         {
             override_char = true;
         }
+        if (ed.pointer + ed.adder < 0 && ed.pointer + ed.adder > DIMENSIONS*DIMENSIONS)
+        {
+            if ed.string_arr[(ed.pointer + ed.adder) as usize] == '\0'
+            {
+                override_char = true;
+            }
+        }
         let print_pointer = ed.pointer;
         let print_adder = ed.adder;
         println!("{print_pointer} += {print_adder}: {override_char}");
         let index: usize = ed.pointer as usize;
-        ed.string_arr[index] = ev.char;
-        if !override_char
+        if ev.char != '\r'
+        {
+            ed.string_arr[index] = ev.char;
+        }
+        if !override_char && ev.char != '\r'
         {
             ed.pointer += ed.adder;
         }
@@ -95,6 +106,21 @@ pub fn text_rendering_system(
 
     if keys.just_pressed(KeyCode::Return)
     {
-        println!("Text input: {:?}", ed.string_arr);
+        let mut string: String = String::new();
+        let mut temp: String = String::new();
+        for i in 0..(DIMENSIONS*(DIMENSIONS + 1)) as usize
+        {
+            if ((i + 1) as i32) % (DIMENSIONS + 1) == 0
+            {
+                string.push('\n');
+                temp.push('\n');
+            }
+            string.push(ed.string_arr[i]);
+            temp.push(ed.string_arr[i]);
+        }
+        println!("{}", temp);
+        ed.pointer = 0;
+        ed.adder = 1;
+        ed.string_arr = Vec::new();
     }
 }
