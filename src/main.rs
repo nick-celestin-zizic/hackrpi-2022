@@ -8,7 +8,7 @@ use bevy::render::texture::*;
 mod rendering; use rendering::*;
 
 const PLAYER_VEL:   f32 = 500.0;
-const ROVER_SCALE:  Vec3 = Vec3::new(2.5, 2.5, 2.5);
+const ROVER_SCALE:  Vec3 = Vec3::new(1.8, 1.8, 1.8);
 const CURSOR_SCALE: Vec3 = Vec3::new(3.0, 3.0, 3.0);
 
 #[derive(Component)]
@@ -45,8 +45,8 @@ fn main() {
                 mag_filter: FilterMode::Nearest,
                 ..Default::default() }})
         .insert_resource(WindowDescriptor {
-            width: 1337.0,
-            height: 800.0,
+            width: 640.0,
+            height: 384.0,
             ..Default::default() })
         .add_plugins(DefaultPlugins)
         .add_startup_system(setup)

@@ -3,6 +3,12 @@
 //use bevy::text::Text2dSize;
 use bevy::{prelude::*};
 
+const DIMENSIONS:i8 = 10;
+const UP:i8 = DIMENSIONS;
+const DOWN:i8 = -1 * DIMENSIONS;
+const RIGHT:i8 = 1;
+const LEFT:i8 = -1;
+
 //Input parameters for displaying text
 //mut commands: Commands, asset_server: Res<AssetServer>
 pub fn text_rendering_system(mut char_evr: EventReader<ReceivedCharacter>, keys: Res<Input<KeyCode>>, mut string: Local<String>)
@@ -28,14 +34,34 @@ pub fn text_rendering_system(mut char_evr: EventReader<ReceivedCharacter>, keys:
     */
 
     // prints every char coming in; press enter to echo the full string
+
+    let mut pointer:i8 = 0;
+    for i in 0..(DIMENSIONS*DIMENSIONS)
+    {
+        string.push(' ');
+    }
+
+    let stringArr: Vec<char> = string.chars().collect();
+    string.clear();
+
     for ev in char_evr.iter()
     {
         println!("Got char: '{}'", ev.char);
-        string.push(ev.char);
+        pointer += 1;
+        /*
+        match ev.char
+        {
+            'v' => {
+                
+            }
+        }
+        */
     }
 
     if keys.just_pressed(KeyCode::Return)
     {
+        let arr: Vec<char> = string.chars().collect();
+        println!("Got char at index 2: '{}'", arr[2]);
         println!("Text input: {}", *string);
         string.clear();
     }
