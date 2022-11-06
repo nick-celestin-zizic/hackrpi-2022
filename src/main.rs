@@ -6,6 +6,7 @@ use bevy::render::render_resource::*;
 use bevy::render::texture::*;
 
 mod rendering; use rendering::*;
+mod spawn_rovers; use spawn_rovers::*;
 
 const PLAYER_VEL:   f32 = 500.0;
 const ROVER_SCALE:  Vec3 = Vec3::new(2.5, 2.5, 2.5);
@@ -50,6 +51,7 @@ fn main() {
         .add_system(player_movement_system)
         .add_system(player_animation_system)
         .add_system(text_rendering_system)
+        .add_system(spawn_rovers_system)
         .run();
 }
 
