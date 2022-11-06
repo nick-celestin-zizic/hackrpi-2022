@@ -36,6 +36,9 @@ enum GameMode {
 }
 
 #[derive(Component)]
+struct EditRectangle;
+
+#[derive(Component)]
 struct Bg;
 
 fn main() {
@@ -56,6 +59,8 @@ fn main() {
         .add_system(player_animation_system)
         .add_system(text_rendering_system)
         .add_system(rover_fix_system_entry)
+        .add_system(coding_system)
+        .add_system(rover_fix_system_exit)
         .run();
 }
 // 0.7
@@ -116,6 +121,8 @@ fn setup(
         transform: Transform::from_xyz(-20., 130., 1.).with_scale(ROVER_SCALE),
         ..Default::default()
     }).insert(Rover {fixed: false});
+
+    commands.spawn().insert(EditorState {pointer: 0, adder: 1, string_arr: Vec::new()});
 
 
 }
@@ -197,6 +204,21 @@ fn player_animation_system(
 
 const ROVER_RANGE: f32 = 60.0;
 
+fn coding_system(
+    mut q_player: Query<(&Transform, &Player)>,
+    mut q_game_mode: Query<(&mut GameMode)>,
+    mut commands: Commands
+){
+    let (game_mode) = q_game_mode.single();
+    if let GameMode::Coding = game_mode {
+        commands.spawn_bundle(SpriteBundle {
+            sprite: Sprite { color: (Color::BLACK), flip_x: false, flip_y: false, custom_size: Some(Vec2::new(360., 160.)), anchor: (bevy::sprite::Anchor::Center) },
+            transform: Transform::from_xyz(0., 0., 3.).with_scale(ROVER_SCALE),
+            ..Default::default()
+        }).insert(EditRectangle);
+    }
+}
+
 fn rover_fix_system_entry(
     keys: Res<Input<KeyCode>>,
     time: Res<Time>,
@@ -228,4 +250,25 @@ fn rover_fix_system_entry(
         }
     }
     
+}
+
+fn rover_fix_system_exit(
+    keys: Res<Input<KeyCode>>,
+    time: Res<Time>,
+    mut q_player: Query<(&Transform, &Player, Without<EditRectangle>)>,
+    mut q_game_mode: Query<(&mut GameMode)>,
+    mut q_rovers: Query<(&Transform, &Rover, Entity, Without<EditRectangle>)>,
+    mut q_rectangle: Query<&mut Transform, With<EditRectangle>>,
+    //Without<Transform>>,
+    mut commands: Commands
+)
+{
+    let (game_mode) = q_game_mode.single();
+    if let GameMode::Coding = game_mode {
+        if keys.just_released(KeyCode::Escape) {
+            // let mut transform = q_rectangle.single_mut();
+            //transform.translation.z = -1.;
+            dbg!("hello");
+        }
+    }
 }
