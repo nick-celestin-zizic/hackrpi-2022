@@ -50,6 +50,7 @@ fn main() {
             ..Default::default() })
         .add_plugins(DefaultPlugins)
         .add_startup_system(setup)
+        .add_startup_system(start_background_audio)
         .add_system(player_input_system)
         .add_system(player_movement_system)
         .add_system(player_animation_system)
@@ -59,6 +60,9 @@ fn main() {
 }
 // 0.7
 
+fn start_background_audio(asset_server: Res<AssetServer>, audio: Res<Audio>) {
+    audio.play(asset_server.load("ambient-space-music.ogg"));
+}
 
 fn setup(
     mut commands: Commands,
