@@ -13,7 +13,7 @@ fn main() {
                 mag_filter: FilterMode::Nearest,
                 ..Default::default() }})
         .insert_resource(WindowDescriptor {
-            width: 1067.0,
+            width: 1337.0,
             height: 800.0,
             ..Default::default()
         })
