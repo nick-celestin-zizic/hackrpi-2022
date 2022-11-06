@@ -6,6 +6,12 @@ use bevy::input::keyboard::*;
 use bevy::render::render_resource::{SamplerDescriptor, FilterMode};
 use bevy::render::texture::ImageSettings;
 
+mod rendering; use rendering::*;
+
+const PLAYER_VEL:   f32 = 500.0;
+const ROVER_SCALE: Vec3 = Vec3::new(2.5, 2.5, 2.5);
+const CURSOR_SCALE: Vec3 = Vec3::new(3.0, 3.0, 3.0);
+
 fn main() {
     App::new()
         .insert_resource(ImageSettings {
@@ -15,13 +21,13 @@ fn main() {
         .insert_resource(WindowDescriptor {
             width: 1337.0,
             height: 800.0,
-            ..Default::default()
-        })
+            ..Default::default() })
         .add_plugins(DefaultPlugins)
         .add_startup_system(setup)
         .add_system(cursor_input_system)
         .add_system(player_input_system)
         .add_system(player_movement_system)
+        .add_system(text_rendering_system)
         .run();
 }
 
@@ -42,13 +48,13 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     
     commands.spawn_bundle(SpriteBundle {
         texture: asset_server.load("littleguy.png"),
-        transform: Transform::from_xyz(100., 0., 0.).with_scale(Vec3::new(5.0, 5.0, 5.0)),
+        transform: Transform::from_xyz(100., 0., 0.).with_scale(ROVER_SCALE),
         ..Default::default()
     }).insert(Player::default());
 
     commands.spawn_bundle(SpriteBundle {
         texture: asset_server.load("cursor_1.png"),
-        transform: Transform::from_xyz(100., 0., 0.).with_scale(Vec3::new(5.0, 5.0, 5.0)),
+        transform: Transform::from_xyz(100., 0., 0.).with_scale(CURSOR_SCALE),
         ..Default::default()
     }).insert(Cursor);
 
@@ -80,8 +86,6 @@ fn cursor_input_system(
         transform.translation = Vec3::new(world_pos.x, world_pos.y, 0.0);
     }
 }
-
-const PLAYER_VEL: f32 = 500.0;
 
 fn player_input_system(
     mut e_key: EventReader<KeyboardInput>,
