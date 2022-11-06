@@ -6,7 +6,6 @@ use bevy::render::render_resource::*;
 use bevy::render::texture::*;
 
 mod rendering; use rendering::*;
-mod spawn_rovers; use spawn_rovers::*;
 
 const PLAYER_VEL:   f32 = 500.0;
 const ROVER_SCALE:  Vec3 = Vec3::new(2.5, 2.5, 2.5);
@@ -27,8 +26,13 @@ struct Cursor;
 struct AnimationTimer(Timer);
 
 #[derive(Component)]
-struct RoverData {
-    
+struct Rover {
+    fixed: bool
+}
+
+#[derive(Component)]
+enum GameMode {
+    Roving, Coding
 }
 
 #[derive(Component)]
@@ -51,7 +55,7 @@ fn main() {
         .add_system(player_movement_system)
         .add_system(player_animation_system)
         .add_system(text_rendering_system)
-        .add_system(spawn_rovers_system)
+        .add_system(rover_fix_system_entry)
         .run();
 }
 
@@ -65,6 +69,8 @@ fn setup(
     let main_anim_atlas_handle = texture_atlases.add(main_anim_atlas);
     
     commands.spawn_bundle(Camera2dBundle::default()).insert(MainCamera);
+
+    commands.spawn().insert(GameMode::Roving);
 
     /*
     commands.spawn_bundle(SpriteBundle {
@@ -85,6 +91,32 @@ fn setup(
         transform: Transform::from_xyz(100., 0., 0.).with_scale(CURSOR_SCALE),
         ..Default::default()
     }).insert(Cursor);
+
+    commands.spawn_bundle(SpriteBundle {
+        texture: asset_server.load("r0ger.png"),
+        transform: Transform::from_xyz(-320., 180., 0.).with_scale(ROVER_SCALE),
+        ..Default::default()
+    }).insert(Rover {fixed: false});
+
+    commands.spawn_bundle(SpriteBundle {
+        texture: asset_server.load("citrus.png"),
+        transform: Transform::from_xyz(400., 350., 0.).with_scale(ROVER_SCALE),
+        ..Default::default()
+    }).insert(Rover {fixed: false});
+
+    commands.spawn_bundle(SpriteBundle {
+        texture: asset_server.load("penolope.png"),
+        transform: Transform::from_xyz(-500., -300., 0.).with_scale(ROVER_SCALE),
+        ..Default::default()
+    }).insert(Rover {fixed: false});
+
+    commands.spawn_bundle(SpriteBundle {
+        texture: asset_server.load("timmy.png"),
+        transform: Transform::from_xyz(575., -350., 0.).with_scale(ROVER_SCALE),
+        ..Default::default()
+    }).insert(Rover {fixed: false});
+
+
 }
 
 fn cursor_input_system(
@@ -160,4 +192,36 @@ fn player_animation_system(
             sprite.index = (sprite.index + 1) % texture_atlas.textures.len();
         }
     } 
+}
+
+fn rover_fix_system_entry(
+    keys: Res<Input<KeyCode>>,
+    time: Res<Time>,
+    mut q_player: Query<(&Transform, &Player)>,
+    mut q_game_mode: Query<(&mut GameMode)>,
+    mut q_rovers: Query<(&Transform, &Rover, Entity)>
+){
+    if keys.just_released(KeyCode::Space) {
+        let (player_transform, player) = q_player.single();
+        let mut min_x = 9999.;
+        let mut min_y = 9999.;
+        let mut closest : Entity;
+        for (transform, rover, entity) in &q_rovers {
+            if !rover.fixed {
+                let x_diff = (transform.translation.x - player_transform.translation.x).abs();
+                let y_diff = (transform.translation.y - player_transform.translation.y).abs();
+                if x_diff <= 10. && x_diff < min_x && y_diff <= 10. && y_diff < min_y {
+                    min_x = x_diff;
+                    min_y = y_diff;
+                    closest = entity;
+                }
+            }
+        }
+        if min_x <= 10. && min_y <= 10. {
+            let mut gam = q_game_mode.single_mut();
+            //let &mut game_mode = q_game_mode.single_mut().into_inner();
+            *gam = GameMode::Coding;
+        }
+    }
+    
 }
