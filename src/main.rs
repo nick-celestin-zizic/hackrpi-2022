@@ -266,7 +266,7 @@ fn rover_fix_system_exit(
     let (game_mode) = q_game_mode.single();
     if let GameMode::Coding = game_mode {
         if keys.just_released(KeyCode::Escape) {
-            // let mut transform = q_rectangle.single_mut();
+            let mut transform = q_rectangle.single_mut();
             //transform.translation.z = -1.;
             dbg!("hello");
         }

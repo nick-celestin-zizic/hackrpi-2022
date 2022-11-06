@@ -3,16 +3,29 @@
 //use bevy::text::Text2dSize;
 use bevy::{prelude::*};
 
-const DIMENSIONS:i8 = 10;
-const UP:i8 = DIMENSIONS;
-const DOWN:i8 = -1 * DIMENSIONS;
-const RIGHT:i8 = 1;
-const LEFT:i8 = -1;
+const DIMENSIONS:i32 = 25;
+const UP:i32 = -1 * DIMENSIONS;
+const DOWN:i32 = DIMENSIONS;
+const RIGHT:i32 = 1;
+const LEFT:i32 = -1;
+
+#[derive(Component)]
+pub struct EditorState
+{
+    pub pointer:i32,
+    pub adder:i32,
+    pub string_arr: Vec<char>,
+}
 
 //Input parameters for displaying text
 //mut commands: Commands, asset_server: Res<AssetServer>
-pub fn text_rendering_system(mut char_evr: EventReader<ReceivedCharacter>, keys: Res<Input<KeyCode>>, mut string: Local<String>)
-{
+pub fn text_rendering_system(
+    mut char_evr: EventReader<ReceivedCharacter>,
+    mut q_editor: Query<&mut EditorState>,
+    keys: Res<Input<KeyCode>>,
+) {
+
+    let mut ed = q_editor.single_mut();
     /* Display text
     //Wrapping box
     let font = asset_server.load("fonts/consola.ttf");
@@ -35,34 +48,53 @@ pub fn text_rendering_system(mut char_evr: EventReader<ReceivedCharacter>, keys:
 
     // prints every char coming in; press enter to echo the full string
 
-    let mut pointer:i8 = 0;
-    for i in 0..(DIMENSIONS*DIMENSIONS)
+    if ed.string_arr.len() <= 0
     {
-        string.push(' ');
+        ed.string_arr.resize((DIMENSIONS*DIMENSIONS) as usize, ' ');
     }
-
-    let stringArr: Vec<char> = string.chars().collect();
-    string.clear();
 
     for ev in char_evr.iter()
     {
-        //println!("Got char: '{}'", ev.char);
-        pointer += 1;
-        /*
+        println!("Got char: '{}'", ev.char);
         match ev.char
         {
             'v' => {
-                
-            }
+                ed.adder=DOWN;
+            },
+            '^' => {
+                ed.adder=UP;
+            },
+            '>' => {
+                ed.adder=RIGHT;
+            },
+            '<' => {
+                ed.adder=LEFT;
+            },
+            _ => {}
         }
-        */
+        //Adds by 1 to ensure when 0 occures, it is at the end of the line
+        let mut override_char:bool = false;
+        if (((ed.pointer + 1) % DIMENSIONS == 0 && ed.adder == RIGHT) || ((ed.pointer + 1) % DIMENSIONS == 1 && ed.adder == LEFT))
+        {
+            override_char = true;
+        }
+        if((ed.pointer <= DIMENSIONS - 1 && ed.adder == UP) || (ed.pointer >= DIMENSIONS*DIMENSIONS - (DIMENSIONS + 1) && ed.adder == DOWN))
+        {
+            override_char = true;
+        }
+        let print_pointer = ed.pointer;
+        let print_adder = ed.adder;
+        println!("{print_pointer} += {print_adder}: {override_char}");
+        let index: usize = ed.pointer as usize;
+        ed.string_arr[index] = ev.char;
+        if !override_char
+        {
+            ed.pointer += ed.adder;
+        }
     }
 
     if keys.just_pressed(KeyCode::Return)
     {
-        let arr: Vec<char> = string.chars().collect();
-        println!("Got char at index 2: '{}'", arr[2]);
-        println!("Text input: {}", *string);
-        string.clear();
+        println!("Text input: {:?}", ed.string_arr);
     }
 }
