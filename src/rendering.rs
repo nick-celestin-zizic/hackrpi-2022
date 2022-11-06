@@ -46,7 +46,7 @@ pub fn text_rendering_system(mut char_evr: EventReader<ReceivedCharacter>, keys:
 
     for ev in char_evr.iter()
     {
-        println!("Got char: '{}'", ev.char);
+        //println!("Got char: '{}'", ev.char);
         pointer += 1;
         /*
         match ev.char

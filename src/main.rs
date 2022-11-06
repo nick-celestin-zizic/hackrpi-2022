@@ -7,8 +7,8 @@ use bevy::render::texture::*;
 
 mod rendering; use rendering::*;
 
-const PLAYER_VEL:   f32 = 500.0;
-const ROVER_SCALE:  Vec3 = Vec3::new(1.8, 1.8, 1.8);
+const PLAYER_VEL:   f32 = 75.0;
+const ROVER_SCALE:  Vec3 = Vec3::new(1.5, 1.5, 1.5);
 const CURSOR_SCALE: Vec3 = Vec3::new(3.0, 3.0, 3.0);
 
 #[derive(Component)]
@@ -50,7 +50,6 @@ fn main() {
             ..Default::default() })
         .add_plugins(DefaultPlugins)
         .add_startup_system(setup)
-        .add_system(cursor_input_system)
         .add_system(player_input_system)
         .add_system(player_movement_system)
         .add_system(player_animation_system)
@@ -58,6 +57,8 @@ fn main() {
         .add_system(rover_fix_system_entry)
         .run();
 }
+// 0.7
+
 
 fn setup(
     mut commands: Commands,
@@ -68,51 +69,47 @@ fn setup(
     let main_anim_atlas        = TextureAtlas::from_grid(main_anim_handle, Vec2::new(32.0, 32.0), 40, 1);
     let main_anim_atlas_handle = texture_atlases.add(main_anim_atlas);
     
-    commands.spawn_bundle(Camera2dBundle::default()).insert(MainCamera);
+    commands.spawn_bundle( Camera2dBundle {
+        transform: Transform::from_scale(Vec3::new(1.0, 1.0, 1.0)).with_translation(Vec3::new(0.0, 0.0, 3.0)),
+        ..Camera2dBundle::default()
+    }).insert(MainCamera);
 
     commands.spawn().insert(GameMode::Roving);
 
-    /*
+    
     commands.spawn_bundle(SpriteBundle {
-        texture: asset_server.load("tilemap.png"),
-        transform: Transform::from_xyz(0.0, 0.0, 0.0).with_scale(Vec3::new(1.5, 1.5, 0.0)),
+        texture: asset_server.load("map.png"),
+        transform: Transform::from_xyz(0.0, 0.0, 0.0).with_scale(Vec3::new(1., 1., 0.0)),
         ..Default::default()
     }).insert(Bg);
-     */
     
     commands.spawn_bundle(SpriteSheetBundle {
         texture_atlas: main_anim_atlas_handle,
-        transform: Transform::from_xyz(100., 0., 0.).with_scale(ROVER_SCALE),
+        transform: Transform::from_xyz(-250., 150., 1.).with_scale(ROVER_SCALE),
         ..Default::default()
     }).insert(Player::default()).insert(AnimationTimer(Timer::from_seconds(0.02, true)));
 
     commands.spawn_bundle(SpriteBundle {
-        texture: asset_server.load("cursor_1.png"),
-        transform: Transform::from_xyz(100., 0., 0.).with_scale(CURSOR_SCALE),
-        ..Default::default()
-    }).insert(Cursor);
-
-    commands.spawn_bundle(SpriteBundle {
         texture: asset_server.load("r0ger.png"),
-        transform: Transform::from_xyz(-80., 90., 0.).with_scale(ROVER_SCALE),
+        transform: Transform::from_xyz(280., -140., 1.).with_scale(ROVER_SCALE),
         ..Default::default()
     }).insert(Rover {fixed: false});
 
     commands.spawn_bundle(SpriteBundle {
         texture: asset_server.load("citrus.png"),
-        transform: Transform::from_xyz(120., 45., 0.).with_scale(ROVER_SCALE),
+        transform: Transform::from_xyz(250., 100., 1.).with_scale(ROVER_SCALE),
         ..Default::default()
     }).insert(Rover {fixed: false});
 
     commands.spawn_bundle(SpriteBundle {
         texture: asset_server.load("penolope.png"),
-        transform: Transform::from_xyz(-100., -50., 0.).with_scale(ROVER_SCALE),
+        transform: Transform::from_xyz(-250., -150., 1.).with_scale(ROVER_SCALE),
         ..Default::default()
     }).insert(Rover {fixed: false});
 
     commands.spawn_bundle(SpriteBundle {
         texture: asset_server.load("timmy.png"),
-        transform: Transform::from_xyz(235., -95., 0.).with_scale(ROVER_SCALE),
+        transform: Transform::from_xyz(-20., 130., 1.).with_scale(ROVER_SCALE),
         ..Default::default()
     }).insert(Rover {fixed: false});
 
@@ -194,6 +191,8 @@ fn player_animation_system(
     } 
 }
 
+const ROVER_RANGE: f32 = 60.0;
+
 fn rover_fix_system_entry(
     keys: Res<Input<KeyCode>>,
     time: Res<Time>,
@@ -202,6 +201,7 @@ fn rover_fix_system_entry(
     mut q_rovers: Query<(&Transform, &Rover, Entity)>
 ){
     if keys.just_released(KeyCode::Space) {
+        
         let (player_transform, player) = q_player.single();
         let mut min_x = 9999.;
         let mut min_y = 9999.;
@@ -210,17 +210,17 @@ fn rover_fix_system_entry(
             if !rover.fixed {
                 let x_diff = (transform.translation.x - player_transform.translation.x).abs();
                 let y_diff = (transform.translation.y - player_transform.translation.y).abs();
-                if x_diff <= 40. && x_diff < min_x && y_diff <= 40. && y_diff < min_y {
+                if x_diff <= ROVER_RANGE && x_diff < min_x && y_diff <= ROVER_RANGE && y_diff < min_y {
                     min_x = x_diff;
                     min_y = y_diff;
                     closest = entity;
                 }
             }
         }
-        if min_x <= 40. && min_y <= 40. {
+        if min_x <= ROVER_RANGE && min_y <= ROVER_RANGE {
             let mut gam = q_game_mode.single_mut();
-            //let &mut game_mode = q_game_mode.single_mut().into_inner();
             *gam = GameMode::Coding;
+            
         }
     }
     
