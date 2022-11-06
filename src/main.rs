@@ -94,25 +94,25 @@ fn setup(
 
     commands.spawn_bundle(SpriteBundle {
         texture: asset_server.load("r0ger.png"),
-        transform: Transform::from_xyz(-320., 180., 0.).with_scale(ROVER_SCALE),
+        transform: Transform::from_xyz(-80., 90., 0.).with_scale(ROVER_SCALE),
         ..Default::default()
     }).insert(Rover {fixed: false});
 
     commands.spawn_bundle(SpriteBundle {
         texture: asset_server.load("citrus.png"),
-        transform: Transform::from_xyz(400., 350., 0.).with_scale(ROVER_SCALE),
+        transform: Transform::from_xyz(120., 45., 0.).with_scale(ROVER_SCALE),
         ..Default::default()
     }).insert(Rover {fixed: false});
 
     commands.spawn_bundle(SpriteBundle {
         texture: asset_server.load("penolope.png"),
-        transform: Transform::from_xyz(-500., -300., 0.).with_scale(ROVER_SCALE),
+        transform: Transform::from_xyz(-100., -50., 0.).with_scale(ROVER_SCALE),
         ..Default::default()
     }).insert(Rover {fixed: false});
 
     commands.spawn_bundle(SpriteBundle {
         texture: asset_server.load("timmy.png"),
-        transform: Transform::from_xyz(575., -350., 0.).with_scale(ROVER_SCALE),
+        transform: Transform::from_xyz(235., -95., 0.).with_scale(ROVER_SCALE),
         ..Default::default()
     }).insert(Rover {fixed: false});
 
@@ -210,14 +210,14 @@ fn rover_fix_system_entry(
             if !rover.fixed {
                 let x_diff = (transform.translation.x - player_transform.translation.x).abs();
                 let y_diff = (transform.translation.y - player_transform.translation.y).abs();
-                if x_diff <= 10. && x_diff < min_x && y_diff <= 10. && y_diff < min_y {
+                if x_diff <= 40. && x_diff < min_x && y_diff <= 40. && y_diff < min_y {
                     min_x = x_diff;
                     min_y = y_diff;
                     closest = entity;
                 }
             }
         }
-        if min_x <= 10. && min_y <= 10. {
+        if min_x <= 40. && min_y <= 40. {
             let mut gam = q_game_mode.single_mut();
             //let &mut game_mode = q_game_mode.single_mut().into_inner();
             *gam = GameMode::Coding;
