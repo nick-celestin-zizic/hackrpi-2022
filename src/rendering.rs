@@ -108,11 +108,11 @@ pub fn text_rendering_system(
     {
         let mut string: String = String::new();
         let mut temp: String = String::new();
-        for i in 0..(DIMENSIONS*(DIMENSIONS + 1)) as usize
+        for i in 0..(DIMENSIONS*(DIMENSIONS)) as usize
         {
             string.push(ed.string_arr[i]);
             temp.push(ed.string_arr[i]);
-            if ((i + 1) as i32) % (DIMENSIONS + 1) == 0
+            if ((i + 1) as i32) % (DIMENSIONS) == 0
             {
                 string.push('\n');
                 temp.push('\n');
